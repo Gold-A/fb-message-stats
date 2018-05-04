@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 
 REACTION_MAP = {
     u'\xf0\x9f\x91\x8d' : "like",
@@ -35,16 +36,18 @@ class MsgType():
 
 class Message:
     def __init__(self, messageJson):
-        self._sender = messageJson["sender_name"]
+        self._sender = str(messageJson["sender_name"])
         self._numGifs = 0
         self._numStickers = 0
         self._numPhotos = 0
         self._numVideos = 0
         self._reactions = []
+        self._bagOfWords = []
 
         if "content" in messageJson:
             self._type = MsgType.TEXT
             self._text = messageJson["content"]
+            self.parseMessage(self._text)
         elif "gifs" in messageJson:
             self._type = MsgType.GIF
             self._numGifs = len(messageJson["gifs"])
@@ -74,3 +77,14 @@ class Message:
 
     def getReactions(self):
         return self._reactions
+
+    def parseMessage(self, text):
+        bagOfWords = text.split()
+        # Handle emoticons e.g. :D -___- :| D:
+        # Handle repeated emojis "\u00f0\u009f\u0098\u008b\u00f0\u009f\u0098\u008b\u00f0\u009f\u0098\u008b"
+        # Check mentions
+        pattern = re.compile('[\W_]+')
+        self._bagOfWords = map((lambda x: pattern.sub('', x.lower())), bagOfWords)
+
+    def getWords(self):
+        return self._bagOfWords
