@@ -103,6 +103,11 @@ def main():
         print hourStr
     print("\n")
 
+    print ("~~FIRST MESSAGE~~")
+    for name, person in people.iteritems():
+        print("%s: %s %s" % (name, person.getDateFirstMessage(), person.getFirstMessage()))
+    print("\n")
+
 main()
 
 

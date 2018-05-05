@@ -1,4 +1,5 @@
 import message as m
+import datetime
 
 class Person:
     def __init__(self, name):
@@ -12,6 +13,8 @@ class Person:
         self._videosSent = 0
         self._stickersSent = 0
         self._linksSent = 0
+        self._dateOfFirstMessage = datetime.datetime.max
+        self._firstMessage = ""
 
 
     def getName(self):
@@ -38,6 +41,12 @@ class Person:
             self._videosSent += msg.numVideos()
         elif msg.hasShare():
             self._linksSent += 1
+
+        msgDate = msg.getDate()
+        if msgDate < self._dateOfFirstMessage:
+            self._dateOfFirstMessage = msgDate
+            self._firstMessage = msg.getContent()
+
 
 
     def numMessagesSent(self):
@@ -127,3 +136,11 @@ class Person:
             hist[msg.hour()] += 1
 
         return hist
+
+
+    def getDateFirstMessage(self):
+        return self._dateOfFirstMessage.isoformat()
+
+
+    def getFirstMessage(self):
+        return self._firstMessage

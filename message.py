@@ -31,13 +31,13 @@ class Reaction:
         return self._speaker
 
 class MsgType():
-    INVALID = 0
-    TEXT = 1
-    GIF = 2
-    STICKER = 3
-    PHOTO = 4
-    VIDEO = 5
-    SHARE = 6
+    INVALID = "invalid"
+    TEXT = "text"
+    GIF = "gif"
+    STICKER = "sticker"
+    PHOTO = "photo"
+    VIDEO = "video"
+    SHARE = "share"
 
 class Message:
     def __init__(self, messageJson):
@@ -51,6 +51,7 @@ class Message:
         self._reactions = []
         self._bagOfWords = []
         self._type = MsgType.INVALID
+        self._text = ""
 
         if "content" in messageJson:
             self._text = messageJson["content"]
@@ -151,3 +152,11 @@ class Message:
 
     def month(self):
         return self._month
+
+    def getDate(self):
+        return self._date
+
+    def getContent(self):
+        if self._text != "":
+            return self._text
+        return self._type
