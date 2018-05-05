@@ -30,6 +30,7 @@ class Reaction:
     def getSpeaker(self):
         return self._speaker
 
+
 class MsgType():
     INVALID = "invalid"
     TEXT = "text"
@@ -38,6 +39,7 @@ class MsgType():
     PHOTO = "photo"
     VIDEO = "video"
     SHARE = "share"
+
 
 class Message:
     def __init__(self, messageJson):
