@@ -1,5 +1,6 @@
 import message as M
 import person as P
+import reactionGraph as RG
 
 import datetime
 
@@ -26,14 +27,6 @@ class Group:
             self._messageHist[name] = person.messageCount()
 
 
-    def allMessages(self):
-        return self._allMessages
-
-
-    def messagesSentHist(self):
-        return self._messageHist
-
-
     def addMember(self, person):
         self._members.append(person)
         self._membersByName[person.getName()] = person
@@ -52,6 +45,9 @@ class Group:
         self.printStat("Week", self.printWeek)
         self.printStat("Month", self.printMonth)
         self.printStat("FIRST MESSAGE", self.printFirstMessage)
+
+        reactionGraph = RG.ReactionGraph(self._allMessages)
+        reactionGraph.printStats(self._messageHist)
 
 
     def printStat(self, title, fnc):

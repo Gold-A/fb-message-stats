@@ -1,3 +1,5 @@
+import message as M
+
 class ReactionGraph:
     def __init__(self, msgs):
         self._reactsByReactor = {}
@@ -61,6 +63,21 @@ class ReactionGraph:
             self._reactsByReactee[speaker][reactor][reaction] = 1
         else:
             self._reactsByReactee[speaker][reactor][reaction] += 1
+
+
+    def printStats(self, messagesSentHist):
+        for k, v in M.REACTION_MAP.iteritems():
+            print("Most %s" % v)
+            self.printReaction("received", v)
+            print("\n")
+            print("%s received by percentage" % v)
+            self.printReactionNormalized("received", messagesSentHist, v)
+
+        for k, v in M.REACTION_MAP.iteritems():
+            print("\n")
+            print("Gave the most %s" % v)
+            self.printReaction("given", v)
+        print("\n")
 
 
     def printReaction(self, rg, reaction):
