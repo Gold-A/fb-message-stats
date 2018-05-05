@@ -1,41 +1,40 @@
 import unittest
 import message
+import person
 import json
+
+def buildMessageJson(insert):
+    sampleJson = """
+    {
+      "sender_name": "John Smith",
+      "timestamp": 1523824963,
+    """ + \
+    insert + \
+    """
+      "reactions": [
+        {
+          "reaction": "\u00f0\u009f\u0098\u0086",
+          "actor": "Jane Jones"
+        }
+      ],
+      "type": "Generic"
+    }
+    """
+    return json.loads(sampleJson)
+
 
 class TestMessage(unittest.TestCase):
 
-    @staticmethod
-    def buildMessageJson(insert):
-        sampleJson = """
-        {
-          "sender_name": "John Smith",
-          "timestamp": 1523824963,
-          "content": "Hello there friend",
-        """ + \
-        insert + \
-        """
-          "reactions": [
-            {
-              "reaction": "\u00f0\u009f\u0098\u0086",
-              "actor": "Jane Jones"
-            }
-          ],
-          "type": "Generic"
-        }
-        """
-        return json.loads(sampleJson)
-
-
     def test_getWords(self):
-        testMessage = message.Message(TestMessage.buildMessageJson(""))
+        testMessage = message.Message(buildMessageJson("\"content\": \"Hello there friend\","))
         result = testMessage.getWords()
         self.assertItemsEqual(result, ["hello", "there", "friend"])
 
 
     def test_Name(self):
-        testMessage = message.Message(TestMessage.buildMessageJson(""))
+        testMessage = message.Message(buildMessageJson(""))
         result = testMessage.getSender()
-        self.assertItemsEqual(result, "John Smith")
+        self.assertEqual(result, "John Smith")
 
 
     def test_Gifs(self):
@@ -47,7 +46,7 @@ class TestMessage(unittest.TestCase):
             }
           ],
         """
-        testMessage = message.Message(TestMessage.buildMessageJson(gifs))
+        testMessage = message.Message(buildMessageJson(gifs))
         self.assertEquals(testMessage.numGifs(), 1)
         self.assertEquals(testMessage.getType(), message.MsgType.GIF)
 
@@ -59,7 +58,7 @@ class TestMessage(unittest.TestCase):
             "media_path": "messages/stickers_used"
           },
         """
-        testMessage = message.Message(TestMessage.buildMessageJson(sticker))
+        testMessage = message.Message(buildMessageJson(sticker))
         self.assertTrue(testMessage.isSticker())
         self.assertEquals(testMessage.getType(), message.MsgType.STICKER)
 
@@ -78,7 +77,7 @@ class TestMessage(unittest.TestCase):
             }
           ],
         """
-        testMessage = message.Message(TestMessage.buildMessageJson(photos))
+        testMessage = message.Message(buildMessageJson(photos))
         self.assertEquals(testMessage.numPhotos(), 2)
         self.assertEquals(testMessage.getType(), message.MsgType.PHOTO)
 
@@ -105,7 +104,7 @@ class TestMessage(unittest.TestCase):
             }
           ],
         """
-        testMessage = message.Message(TestMessage.buildMessageJson(videos))
+        testMessage = message.Message(buildMessageJson(videos))
         self.assertEquals(testMessage.numVideos(), 2)
         self.assertEquals(testMessage.getType(), message.MsgType.VIDEO)
 
@@ -137,6 +136,52 @@ class TestMessage(unittest.TestCase):
         testMessage2 = message.Message(impliedShare)
         self.assertTrue(testMessage2.hasShare())
         self.assertEquals(testMessage2.getType(), message.MsgType.SHARE)
+
+
+class TestPerson(unittest.TestCase):
+    def setUp(self):
+        msgs = []
+        photos = """
+            "content": "Hello there friend",
+            "photos": [
+                {
+                  "uri": "messages/groupID/photos/1111.png",
+                  "media_path": "messages/groupID/photos"
+                },
+                {
+                  "uri": "messages/groupID/photos/2222.png",
+                  "media_path": "messages/groupID/photos"
+                }
+            ],
+        """
+        sticker = """
+          "sticker": {
+            "uri": "messages/stickers_used/1111.png",
+            "media_path": "messages/stickers_used"
+          },
+        """
+        msgs.append(message.Message(buildMessageJson(photos)))
+        msgs.append(message.Message(buildMessageJson(sticker)))
+        msgs.append(message.Message(buildMessageJson("\"content\": \"My friend says hello\",")))
+        self._testPerson = person.Person("John Smith")
+        for msg in msgs:
+            self._testPerson.addMessage(msg)
+
+
+    def test_Name(self):
+        name = self._testPerson.getName()
+        self.assertEquals(name, "John Smith")
+
+
+    def test_Counts(self):
+        self.assertEquals(self._testPerson.numMessagesSent(), 3)
+        self.assertEquals(self._testPerson.numStickersSent(), 1)
+        self.assertEquals(self._testPerson.numPhotosSent(), 2)
+
+
+    def test_TopWords(self):
+        topwords = [x[0] for x in self._testPerson.topWords(2)]
+        self.assertItemsEqual(topwords, ["friend", "hello"])
 
 
 if __name__ == '__main__':

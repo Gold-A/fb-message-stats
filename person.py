@@ -31,7 +31,7 @@ class Person:
         if msgType == m.MsgType.GIF:
             self._gifsSent += msg.numGifs()
         elif msgType == m.MsgType.STICKER:
-            self._stickersSent += msg.numStickers()
+            self._stickersSent += 1
         elif msgType == m.MsgType.PHOTO:
             self._photosSent += msg.numPhotos()
         elif msgType == m.MsgType.VIDEO:

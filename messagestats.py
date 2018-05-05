@@ -34,6 +34,8 @@ def main():
 
     allMessages = []
     for msgJson in messagesData["messages"]:
+        if msgJson["type"] != "Generic" and msgJson["type"] != "Share":
+            continue
         message = M.Message(msgJson)
         allMessages.append(message)
         senderName = message.getSender()

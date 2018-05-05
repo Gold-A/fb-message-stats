@@ -31,6 +31,7 @@ class Reaction:
         return self._speaker
 
 class MsgType():
+    INVALID = 0
     TEXT = 1
     GIF = 2
     STICKER = 3
@@ -40,6 +41,7 @@ class MsgType():
 
 class Message:
     def __init__(self, messageJson):
+        self._originalJsonForm = messageJson
         self._sender = str(messageJson["sender_name"])
         self._numGifs = 0
         self._isSticker = False
@@ -48,6 +50,7 @@ class Message:
         self._hasShare = False
         self._reactions = []
         self._bagOfWords = []
+        self._type = MsgType.INVALID
 
         if "content" in messageJson:
             self._text = messageJson["content"]
@@ -73,6 +76,9 @@ class Message:
         elif "share" in messageJson:
             self._type = MsgType.SHARE
             self._hasShare = True
+
+        if self._type == None:
+            return
 
         self._timestamp = messageJson["timestamp"]
         self._date = datetime.fromtimestamp(self._timestamp)
@@ -108,7 +114,11 @@ class Message:
 
 
     def getType(self):
-        return self._type
+        try:
+            return self._type
+        except Exception, e:
+            print self._originalJsonForm
+            raise e
 
 
     def numGifs(self):
