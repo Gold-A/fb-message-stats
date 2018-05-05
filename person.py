@@ -73,6 +73,14 @@ class Person:
         # filterout boring words e.g. "the" "i" "a"
 
 
+    def wordCount(self):
+        return self._totalWordCount
+
+
+    def messageCount(self):
+        return len(self._messagesSent)
+
+
     def weekHistogram(self):
         WEEK = {
             0 : "M",

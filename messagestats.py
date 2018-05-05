@@ -6,16 +6,6 @@ import reactionGraph as RG
 import person as P
 import string
 
-def messagesSent(msgs):
-    hist = {}
-    for msg in msgs:
-        sender = msg.getSender()
-        if sender in hist:
-            hist[sender] += 1
-        else:
-            hist[sender] = 1
-    return hist
-
 
 def main():
     print(sys.argv[1])
@@ -43,11 +33,18 @@ def main():
             people[senderName] = P.Person(senderName)
         people[senderName].addMessage(message)
 
+    messagesSentHist = {}
+    for name, person in people.iteritems():
+        messagesSentHist[name] = person.messageCount()
 
-    messagesSentHist = messagesSent(allMessages)
-    print("~~Most Talkative~~")
-    for sender, count in sorted(messagesSentHist.iteritems(), key=lambda (k,v): (v,k), reverse=True):
-        print("%s: %s" % (sender, count))
+    print("~~Most Spammy (messages)~~")
+    for name, person in sorted(people.iteritems(), key=lambda (k, v): (v.messageCount(), k), reverse=True):
+        print("%s: %s" % (name, person.messageCount()))
+    print("\n")
+
+    print("~~Most Talkative (words)~~")
+    for name, person in sorted(people.iteritems(), key=lambda (k, v): (v.wordCount(), k), reverse=True):
+        print("%s: %s" % (name, person.wordCount()))
     print("\n")
 
     print("~~Average words / message~~")
