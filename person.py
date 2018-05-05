@@ -71,3 +71,51 @@ class Person:
     def topWords(self, x):
         return sorted(self._wordsSent.iteritems(), key=lambda (k,v): (v,k), reverse=True)[:x]
         # filterout boring words e.g. "the" "i" "a"
+
+
+    def weekHistogram(self):
+        WEEK = {
+            0 : "M",
+            1 : "Tu",
+            2 : "W",
+            3 : "Th",
+            4 : "F",
+            5 : "Sa",
+            6 : "Su",
+        }
+
+        hist = {
+            "Su" : 0,
+            "M" : 0,
+            "Tu" : 0,
+            "W" : 0,
+            "Th" : 0,
+            "F" : 0,
+            "Sa" : 0,
+        }
+        for msg in self._messagesSent:
+            hist[WEEK[msg.weekday()]] += 1
+
+        return hist
+
+
+    def monthHistogram(self):
+        hist = {}
+        for i in range(12):
+            hist[i+1] = 0
+
+        for msg in self._messagesSent:
+            hist[msg.month()] += 1
+
+        return hist
+
+
+    def hourHistogram(self):
+        hist = {}
+        for i in range(24):
+            hist[i] = 0
+
+        for msg in self._messagesSent:
+            hist[msg.hour()] += 1
+
+        return hist

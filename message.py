@@ -140,3 +140,14 @@ class Message:
     def hasShare(self):
         return self._hasShare
 
+
+    def hour(self):
+        return self._hourOfDay
+
+
+    def weekday(self):
+        return self._dayOfWeek
+
+
+    def month(self):
+        return self._month

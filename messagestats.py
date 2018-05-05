@@ -74,7 +74,37 @@ def main():
         print("\n")
         print("Gave the most %s" % v)
         reactionGraph.printReaction("given", v)
+    print("\n")
 
+    print("~~Week~~")
+    print("SENDER\tSUN\tMON\tTUE\tWED\tTHU\tFRI\tSAT")
+    for name, person in people.iteritems():
+        week = person.weekHistogram()
+        print("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (name.split()[0], week["Su"], week["M"], week["Tu"], week["W"], week["Th"], week["F"], week["Sa"]))
+    print("\n")
+
+    print("~~Month~~")
+    print("SENDER\tJ\tF\tM\tA\tM\tJ\tJ\tA\tS\tO\tN\tD")
+    for name, person in people.iteritems():
+        month = person.monthHistogram()
+        monthStr = name.split()[0]
+        for k, v in month.iteritems():
+            monthStr += ("\t" + str(v))
+        print monthStr
+    print("\n")
+
+    print("~~Hour~~")
+    hourheader = "SENDER"
+    for i in range(24):
+        hourheader += "\t" + str(i)
+    print hourheader
+    for name, person in people.iteritems():
+        hour = person.hourHistogram()
+        hourStr = name.split()[0]
+        for k, v in hour.iteritems():
+            hourStr += ("\t" + str(v))
+        print hourStr
+    print("\n")
 
 main()
 
