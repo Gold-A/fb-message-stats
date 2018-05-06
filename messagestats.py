@@ -19,10 +19,6 @@ def main():
     group.printStats()
 
 
-
-
-
-
 main()
 
 

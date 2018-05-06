@@ -37,14 +37,66 @@ class Group:
 
 
     def printStats(self):
-        self.printStat("Most Spammy (messages)", self.printMostMessages)
-        self.printStat("Most Talkative (words)", self.printMostWords)
-        self.printStat("Average words / message", self.printAverageWordsPerMessage)
-        self.printStat("Top Words", self.printTopWords)
-        self.printStat("Hour", self.printHour)
-        self.printStat("Week", self.printWeek)
-        self.printStat("Month", self.printMonth)
-        self.printStat("FIRST MESSAGE", self.printFirstMessage)
+        intStats = [
+            {
+                "title" : "Most Spammy (messages)",
+                "func" : lambda x: x.messageCount()
+            },
+            {
+                "title" : "Most Talkative (words)",
+                "func" : lambda x: x.wordCount()
+            },
+            {
+                "title" : "GIFs Sent",
+                "func" : lambda x: x.numGifsSent()
+            },
+            {
+                "title" : "Photos Sent",
+                "func" : lambda x: x.numPhotosSent()
+            },
+            {
+                "title" : "Videos Sent",
+                "func" : lambda x: x.numVideosSent()
+            },
+            {
+                "title" : "Links Sent",
+                "func" : lambda x: x.numLinksSent()
+            },
+        ]
+
+        stats = [
+            {
+                "title" : "Average words / message",
+                "func" : self.printAverageWordsPerMessage
+            },
+            {
+                "title" : "Top Words",
+                "func" : self.printTopWords
+            },
+            {
+                "title" : "Hour",
+                "func" : self.printHour
+            },
+            {
+                "title" : "Week",
+                "func" : self.printWeek
+            },
+            {
+                "title" : "Month",
+                "func" : self.printMonth
+            },
+            {
+                "title" : "FIRST MESSAGE",
+                "func" : self.printFirstMessage
+            },
+
+        ]
+
+        for stat in stats:
+            self.printStat(stat["title"], stat["func"])
+
+        for stat in intStats:
+            self.printIntegerStatSorted(stat["title"], stat["func"])
 
         reactionGraph = RG.ReactionGraph(self._allMessages)
         reactionGraph.printStats(self._messageHist)
@@ -55,16 +107,13 @@ class Group:
         fnc()
         print("\n")
 
-    def printMostMessages(self):
-        for person in sorted(self._members, key=lambda x: x.messageCount(), reverse=True):
-            name = person.getName()
-            print("%s: %s" % (name, person.messageCount()))
 
-
-    def printMostWords(self):
-        for person in sorted(self._members, key=lambda x: x.wordCount(), reverse=True):
+    def printIntegerStatSorted(self, title, fnc):
+        print("~~%s~~" % title)
+        for person in sorted(self._members, key=fnc, reverse=True):
             name = person.getName()
-            print("%s: %s" % (name, person.wordCount()))
+            print("%s: %s" % (name, fnc(person)))
+        print("\n")
 
 
     def printAverageWordsPerMessage(self):
