@@ -12,6 +12,48 @@ REACTION_MAP = {
 }
 
 
+class Emoji:
+
+    @staticmethod
+    def emojiMatch(word):
+        pattern = r'\\xf0\\x9f\\x\w\w\\x\w\w'
+        result = re.findall(pattern, word)
+        return result
+
+    EMOJI_MAP = {
+        "\\xf0\\x9f\\xa4\\x94" : "*ChinScratch*",
+        "\\xf0\\x9f\\x8d\\x89" : "*Watermelon*",
+        "\\xf0\\x9f\\x98\\x82" : "*LaughingTears",
+        "\\xf0\\x9f\\x98\\xad" : "*Bawling*",
+        "\\xf0\\x9f\\x98\\x90" : ":|",
+        "\\xf0\\x9f\\x98\\xae" : ":O",
+        "\\xf0\\x9f\\x8e\\xa4" : "*Microphone*",
+        "\\xf0\\x9f\\x98\\x8d" : "*HeartEyes*",
+        "\\xf0\\x9f\\x98\\x83" : ":D",
+        "\\xf0\\x9f\\x98\\x9e" : ":(",
+        "\\xf0\\x9f\\x98\\x80" : "*GrinningFace*",
+        "\\xf0\\x9f\\x98\\xb5" : "*SpiralEyes*",
+        "\\xf0\\x9f\\x98\\xb1" : "*Scream*",
+        "\\xf0\\x9f\\x98\\x8e" : "*Sunglasses*",
+        "\\xf0\\x9f\\xa4\\xb7" : "*Shrug*",
+        "\\xf0\\x9f\\xa4\\x97" : "*HuggingFace*",
+        "\\xf0\\x9f\\x98\\x8f" : "*Smirk*",
+        "\\xf0\\x9f\\x98\\xb4" : "*ZZZFace*",
+        "\\xf0\\x9f\\x98\\x8b" : ":P",
+        "\\xf0\\x9f\\x98\\xb2" : "*Astonished*",
+        "\\xf0\\x9f\\x91\\x8c" : "*Okay*",
+        "\\xf0\\x9f\\x91\\x8d" : "*Thumbsup*",
+        "\\xf0\\x9f\\x91\\xb4" : "*Oldman*",
+        "\\xf0\\x9f\\x99\\x86" : "*OHands*",
+    }
+
+    @staticmethod
+    def translate(uword):
+        if uword in Emoji.EMOJI_MAP:
+            return Emoji.EMOJI_MAP[uword]
+        else:
+            return uword
+
 class Reaction:
     def __init__(self, reactJson, speaker):
         self._reaction = REACTION_MAP[reactJson["reaction"]]
@@ -109,7 +151,9 @@ class Message:
         # Handle repeated emojis "\u00f0\u009f\u0098\u008b\u00f0\u009f\u0098\u008b\u00f0\u009f\u0098\u008b"
         # Check mentions
         pattern = re.compile('[\W_]+')
-        self._bagOfWords = map((lambda x: pattern.sub('', x.lower())), bagOfWords)
+        self._bagOfWords = map((lambda x: repr(x)), bagOfWords)
+        # self._bagOfWords = map((lambda x: pattern.sub('', x.lower())), bagOfWords)
+        # TODO combine lower and emoji and other parsing
 
 
     def getWords(self):

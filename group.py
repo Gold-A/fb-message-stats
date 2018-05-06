@@ -1,7 +1,6 @@
 import message as M
 import person as P
 import reactionGraph as RG
-
 import datetime
 
 class Group:
@@ -10,6 +9,7 @@ class Group:
         self._membersByName = {}
         self._allMessages = []
         self._messageHist = {}
+        self._emojiHist = {}
         for msgJson in allMessages:
             if msgJson["type"] != "Generic" and msgJson["type"] != "Share":
                 continue
@@ -34,6 +34,19 @@ class Group:
 
     def getMembers(self):
         return self._members
+
+
+    def emojiHist(self):
+        if len(self._emojiHist) > 0:
+            return self._emojiHist
+
+        for person in self._members:
+            for emoji, count in person.emojiSent():
+                if emoji in self._emojiHist:
+                    self._emojiHist[emoji] += count
+                else:
+                    self._emojiHist[emoji] = count
+        return self._emojiHist
 
 
     def printStats(self):
@@ -74,6 +87,10 @@ class Group:
                 "func" : self.printTopWords
             },
             {
+                "title" : "Emoji",
+                "func" : self.printEmoji
+            },
+            {
                 "title" : "Hour",
                 "func" : self.printHour
             },
@@ -88,6 +105,10 @@ class Group:
             {
                 "title" : "FIRST MESSAGE",
                 "func" : self.printFirstMessage
+            },
+            {
+                "title" : "Total Emojis",
+                "func" : self.printTotalEmoji
             },
 
         ]
@@ -116,16 +137,28 @@ class Group:
         print("\n")
 
 
+
     def printAverageWordsPerMessage(self):
         for person in sorted(self._members, key=lambda x: (x.numWordsSent() / x.numMessagesSent())):
             name = person.getName()
             print("%s: %.2f" % (name, float(person.numWordsSent()) / person.numMessagesSent()))
 
 
+    def printTotalEmoji(self):
+        for emoji, count in sorted(self.emojiHist().iteritems(), key=lambda (k, v): (v, k), reverse=True)[:20]:
+            print("%s, %d" % (emoji, count))
+
+
     def printTopWords(self):
         for person in self._members:
             name = person.getName()
             print("%s: %s" % (name, person.topWords(5)))
+
+
+    def printEmoji(self):
+        for person in self._members:
+            name = person.getName()
+            print("%s: %s" % (name, person.emojiSent()))
 
 
     def printWeek(self):

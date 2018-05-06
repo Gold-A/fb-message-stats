@@ -138,6 +138,12 @@ class TestMessage(unittest.TestCase):
         self.assertEquals(testMessage2.getType(), message.MsgType.SHARE)
 
 
+    def test_Unicode(self):
+        matches = message.Message.unicodeMatch(repr(u'\xf0\x9f\x98\xae\xf0\x9f\x98\xae'))
+
+        self.assertItemsEqual(matches, ["\\xf0\\x9f\\x98\\xae", "\\xf0\\x9f\\x98\\xae"])
+
+
 class TestPerson(unittest.TestCase):
     def setUp(self):
         msgs = []
