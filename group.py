@@ -1,6 +1,6 @@
-import message as M
-import person as P
-import reactionGraph as RG
+from message import Message
+from person import Person
+from reactionGraph import ReactionGraph
 import datetime
 
 class Group:
@@ -13,11 +13,11 @@ class Group:
         for msgJson in allMessages:
             if msgJson["type"] != "Generic" and msgJson["type"] != "Share":
                 continue
-            message = M.Message(msgJson)
+            message = Message(msgJson)
             self._allMessages.append(message)
             senderName = message.getSender()
             if senderName not in self._membersByName:
-                newPerson = P.Person(senderName)
+                newPerson = Person(senderName)
                 self._membersByName[senderName] = newPerson
                 self.addMember(newPerson)
 
@@ -119,7 +119,7 @@ class Group:
         for stat in intStats:
             self.printIntegerStatSorted(stat["title"], stat["func"])
 
-        reactionGraph = RG.ReactionGraph(self._allMessages)
+        reactionGraph = ReactionGraph(self._allMessages)
         reactionGraph.printStats(self._messageHist)
 
 

@@ -1,4 +1,4 @@
-import message as m
+from message import Emoji, MsgType
 import datetime
 
 class Person:
@@ -29,10 +29,10 @@ class Person:
                 self._wordsSent[word] += 1
             else:
                 self._wordsSent[word] = 1
-            emojiChars = m.Emoji.emojiMatch(word)
+            emojiChars = Emoji.emojiMatch(word)
             if emojiChars:
                 for match in emojiChars:
-                    translated = m.Emoji.translate(match)
+                    translated = Emoji.translate(match)
                     if translated in self._emojiSent:
                         self._emojiSent[translated] += 1
                     else:
@@ -40,13 +40,13 @@ class Person:
             self._totalWordCount += 1
 
         msgType = msg.getType()
-        if msgType == m.MsgType.GIF:
+        if msgType == MsgType.GIF:
             self._gifsSent += msg.numGifs()
-        elif msgType == m.MsgType.STICKER:
+        elif msgType == MsgType.STICKER:
             self._stickersSent += 1
-        elif msgType == m.MsgType.PHOTO:
+        elif msgType == MsgType.PHOTO:
             self._photosSent += msg.numPhotos()
-        elif msgType == m.MsgType.VIDEO:
+        elif msgType == MsgType.VIDEO:
             self._videosSent += msg.numVideos()
         elif msg.hasShare():
             self._linksSent += 1

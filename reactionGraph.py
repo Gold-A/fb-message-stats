@@ -1,4 +1,4 @@
-import message as M
+from message import REACTION_MAP
 
 class ReactionGraph:
     def __init__(self, msgs):
@@ -66,14 +66,14 @@ class ReactionGraph:
 
 
     def printStats(self, messagesSentHist):
-        for k, v in M.REACTION_MAP.iteritems():
+        for k, v in REACTION_MAP.iteritems():
             print("Most %s" % v)
             self.printReaction("received", v)
             print("\n")
             print("%s received by percentage" % v)
             self.printReactionNormalized("received", messagesSentHist, v)
 
-        for k, v in M.REACTION_MAP.iteritems():
+        for k, v in REACTION_MAP.iteritems():
             print("\n")
             print("Gave the most %s" % v)
             self.printReaction("given", v)
