@@ -6,7 +6,7 @@ class Person:
         self._name = name
         self._messagesSent = []
         self._wordsSent = {}
-        self._emojiSent = {}
+        self._emojisSent = {}
         self._totalWordCount = 0
         self._stickersSent = 0
         self._gifsSent = 0
@@ -33,10 +33,10 @@ class Person:
             if emojiChars:
                 for match in emojiChars:
                     translated = Emoji.translate(match)
-                    if translated in self._emojiSent:
-                        self._emojiSent[translated] += 1
+                    if translated in self._emojisSent:
+                        self._emojisSent[translated] += 1
                     else:
-                        self._emojiSent[translated] = 1
+                        self._emojisSent[translated] = 1
             self._totalWordCount += 1
 
         msgType = msg.getType()
@@ -90,8 +90,8 @@ class Person:
         # filterout boring words e.g. "the" "i" "a"
 
 
-    def emojiSent(self):
-        return sorted(self._emojiSent.iteritems(), key=lambda (k,v): (v,k), reverse=True)
+    def emojisSent(self):
+        return sorted(self._emojisSent.iteritems(), key=lambda (k,v): (v,k), reverse=True)
 
 
     def wordCount(self):

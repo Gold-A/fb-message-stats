@@ -41,7 +41,7 @@ class TestMessage(unittest.TestCase):
             # "\"content\": \"Hello there friend'ly -___-\","
         ))
         result = testMessage.getWords()
-        expected = ["theyre", "there", "friend", "*ChinScratch*", "*ChinScratch*", ":|", "-___-"]
+        expected = ["theyre", "there", "friend", "\\xf0\\x9f\\xa4\\x94", "\\xf0\\x9f\\xa4\\x94", "\\xf0\\x9f\\x98\\x90", "-___-"]
         self.assertItemsEqual(result, expected)
 
 
@@ -162,7 +162,7 @@ class TestPerson(unittest.TestCase):
     def setUp(self):
         msgs = []
         photos = """
-            "content": "Hello there friend",
+            "content": "Hello there friend\u00f0\u009f\u00a4\u0094",
             "photos": [
                 {
                   "uri": "messages/groupID/photos/1111.png",
@@ -192,6 +192,11 @@ class TestPerson(unittest.TestCase):
         name = self._testPerson.getName()
         self.assertEquals(name, "John Smith")
 
+
+    def test_Emoji(self):
+        emojisActual = self._testPerson.emojisSent()
+        emojisExpected = ["*ChinScratch*"]
+        self.assertEquals(emojisActual, emojisActual)
 
     def test_Counts(self):
         self.assertEquals(self._testPerson.numMessagesSent(), 3)

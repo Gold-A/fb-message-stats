@@ -164,7 +164,6 @@ class Message:
     @staticmethod
     def formatWord(text):
         emojis = Emoji.emojiMatch(repr(text))
-        translatedEmojis = map(lambda x: Emoji.translate(x), emojis)
         for emoji in emojis:
             text.replace(emoji, " ")
         remainingWords = text.split()
@@ -175,7 +174,7 @@ class Message:
 
         pattern = re.compile('[\W_]+')
         formattedWords = map((lambda x: pattern.sub('', x.lower())), remainingWords)
-        ret = filter(lambda x: len(x) > 0, formattedWords) + translatedEmojis + nonAlphaNumericWords
+        ret = filter(lambda x: len(x) > 0, formattedWords) + emojis + nonAlphaNumericWords
         return ret
 
     def getWords(self):

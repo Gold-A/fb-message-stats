@@ -41,7 +41,7 @@ class Group:
             return self._emojiHist
 
         for person in self._members:
-            for emoji, count in person.emojiSent():
+            for emoji, count in person.emojisSent():
                 if emoji in self._emojiHist:
                     self._emojiHist[emoji] += count
                 else:
@@ -158,7 +158,7 @@ class Group:
     def printEmoji(self):
         for person in self._members:
             name = person.getName()
-            print("%s: %s" % (name, person.emojiSent()))
+            print("%s: %s" % (name, person.emojisSent()))
 
 
     def printWeek(self):
