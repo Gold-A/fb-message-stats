@@ -1,6 +1,6 @@
-from message import Emoji, MsgType
+from message import Emoji, MsgType, Message
 import datetime
-
+import re
 class Person:
     def __init__(self, name):
         self._name = name
@@ -25,10 +25,6 @@ class Person:
     def addMessage(self, msg):
         self._messagesSent.append(msg)
         for word in msg.getWords():
-            if word in self._wordsSent:
-                self._wordsSent[word] += 1
-            else:
-                self._wordsSent[word] = 1
             emojiChars = Emoji.emojiMatch(word)
             if emojiChars:
                 for match in emojiChars:
@@ -37,7 +33,17 @@ class Person:
                         self._emojisSent[translated] += 1
                     else:
                         self._emojisSent[translated] = 1
-            self._totalWordCount += 1
+                    if translated in self._wordsSent:
+                        self._wordsSent[translated] += 1
+                    else:
+                        self._wordsSent[translated] = 1
+                    self._totalWordCount += 1
+            else:
+                if word in self._wordsSent:
+                    self._wordsSent[word] += 1
+                else:
+                    self._wordsSent[word] = 1
+                self._totalWordCount += 1
 
         msgType = msg.getType()
         if msgType == MsgType.GIF:
@@ -86,8 +92,8 @@ class Person:
 
 
     def topWords(self, x):
-        return sorted(self._wordsSent.iteritems(), key=lambda (k,v): (v,k), reverse=True)[:x]
-        # filterout boring words e.g. "the" "i" "a"
+        filtered = filter(lambda (k,v): not Message.isBoringWord(k), self._wordsSent.iteritems())
+        return sorted(filtered, key=lambda (k,v): (v,k), reverse=True)[:x]
 
 
     def emojisSent(self):

@@ -162,7 +162,7 @@ class TestPerson(unittest.TestCase):
     def setUp(self):
         msgs = []
         photos = """
-            "content": "Hello there friend\u00f0\u009f\u00a4\u0094",
+            "content": "Hello there my friend\u00f0\u009f\u00a4\u0094\u00f0\u009f\u00a4\u0094",
             "photos": [
                 {
                   "uri": "messages/groupID/photos/1111.png",
@@ -182,7 +182,9 @@ class TestPerson(unittest.TestCase):
         """
         msgs.append(Message(buildMessageJson(photos)))
         msgs.append(Message(buildMessageJson(sticker)))
-        msgs.append(Message(buildMessageJson("\"content\": \"My friend says hello\",")))
+        msgs.append(Message(buildMessageJson("\"content\": \"my friend says hello \",")))
+        msgs.append(Message(buildMessageJson("\"content\": \"\u00f0\u009f\u00a4\u0094\",")))
+        msgs.append(Message(buildMessageJson("\"content\": \"\u00f0\u009f\u00a4\u0094 my my\",")))
         self._testPerson = Person("John Smith")
         for msg in msgs:
             self._testPerson.addMessage(msg)
@@ -199,14 +201,15 @@ class TestPerson(unittest.TestCase):
         self.assertEquals(emojisActual, emojisActual)
 
     def test_Counts(self):
-        self.assertEquals(self._testPerson.numMessagesSent(), 3)
+        self.assertEquals(self._testPerson.numMessagesSent(), 5)
         self.assertEquals(self._testPerson.numStickersSent(), 1)
         self.assertEquals(self._testPerson.numPhotosSent(), 2)
 
 
     def test_TopWords(self):
-        topwords = [x[0] for x in self._testPerson.topWords(2)]
-        self.assertItemsEqual(topwords, ["friend", "hello"])
+        topwords = [x[0] for x in self._testPerson.topWords(3)]
+        # my is part of top 100 english words so it should be filtered
+        self.assertItemsEqual(topwords, ["friend", "hello", "*ChinScratch*"])
 
 
 if __name__ == '__main__':

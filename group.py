@@ -145,7 +145,7 @@ class Group:
 
 
     def printTotalEmoji(self):
-        for emoji, count in sorted(self.emojiHist().iteritems(), key=lambda (k, v): (v, k), reverse=True)[:20]:
+        for emoji, count in sorted(self.emojiHist().iteritems(), key=lambda (k, v): (v, k), reverse=True)[:10]:
             print("%s, %d" % (emoji, count))
 
 

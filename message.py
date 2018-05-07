@@ -45,7 +45,17 @@ class Emoji:
         "\\xf0\\x9f\\x91\\x8d" : "*Thumbsup*",
         "\\xf0\\x9f\\x91\\xb4" : "*Oldman*",
         "\\xf0\\x9f\\x99\\x86" : "*OHands*",
+        "\\xf0\\x9f\\xa7\\x90" : "*Monicle*",
+        "\\xf0\\x9f\\x8e\\x82" : "*Cake*",
+        "\\xf0\\x9f\\x98\\x95" : ":S",
+        "\\xf0\\x9f\\x99\\x83" : "*UpsideDownSmile*",
+        "\\xf0\\x9f\\x94\\xa5" : "*Fire*",
+        "\\xf0\\x9f\\x98\\xb7" : "*MedicalMask*",
+        "\\xf0\\x9f\\x98\\x91" : "-_-",
+        "\\xf0\\x9f\\x91\\x8b" : "*Wave*",
+        "\\xf0\\x9f\\x98\\xa9" : "*WearyFace*",
     }
+
 
     @staticmethod
     def translate(uword):
@@ -160,14 +170,26 @@ class Message:
         # Handle emoticons e.g. :D :| D:
         self._bagOfWords = [word for  sublist in map((lambda x: Message.formatWord(x)), bagOfWords) for word in sublist]
 
+    @staticmethod
+    def removeU(text):
+        if text[0] == 'u':
+            return text[1:]
+        return text
 
     @staticmethod
     def formatWord(text):
-        emojis = Emoji.emojiMatch(repr(text))
+        # This is all super hacky, playing around with raw strings and unicodes
+        text = repr(text)
+        if text.startswith("u"):
+            text = text[2:-1]
+            text = text.replace("\\xe2\\x80\\x99", "'")
+
+        emojis = Emoji.emojiMatch(text)
         for emoji in emojis:
-            text.replace(emoji, " ")
+            text = text.replace(emoji, " ", 1)
         remainingWords = text.split()
         nonAlphaNumericWords = []
+
         for word in remainingWords:
             if re.match('^[^a-zA-Z0-9]+$', word):
                 nonAlphaNumericWords.append(word)
@@ -176,6 +198,7 @@ class Message:
         formattedWords = map((lambda x: pattern.sub('', x.lower())), remainingWords)
         ret = filter(lambda x: len(x) > 0, formattedWords) + emojis + nonAlphaNumericWords
         return ret
+
 
     def getWords(self):
         return self._bagOfWords
@@ -220,10 +243,121 @@ class Message:
     def month(self):
         return self._month
 
+
     def getDate(self):
         return self._date
+
 
     def getContent(self):
         if self._text != "":
             return self._text
         return self._type
+
+
+    @staticmethod
+    def isBoringWord(word):
+        top100EnglishWords = [
+            "the",
+            "be",
+            "to",
+            "of",
+            "and",
+            "a",
+            "in",
+            "that",
+            "have",
+            "i",
+            "it",
+            "for",
+            "not",
+            "on",
+            "with",
+            "he",
+            "as",
+            "you",
+            "do",
+            "at",
+            "this",
+            "but",
+            "his",
+            "by",
+            "from",
+            "they",
+            "we",
+            "say",
+            "her",
+            "she",
+            "or",
+            "an",
+            "will",
+            "my",
+            "one",
+            "all",
+            "would",
+            "there",
+            "their",
+            "what",
+            "so",
+            "up",
+            "out",
+            "if",
+            "about",
+            "who",
+            "get",
+            "which",
+            "go",
+            "me",
+            "when",
+            "make",
+            "can",
+            "like",
+            "time",
+            "no",
+            "just",
+            "him",
+            "know",
+            "take",
+            "people",
+            "into",
+            "year",
+            "your",
+            "good",
+            "some",
+            "could",
+            "them",
+            "see",
+            "other",
+            "than",
+            "then",
+            "now",
+            "look",
+            "only",
+            "come",
+            "its",
+            "over",
+            "think",
+            "also",
+            "back",
+            "after",
+            "use",
+            "two",
+            "how",
+            "our",
+            "work",
+            "first",
+            "well",
+            "way",
+            "even",
+            "new",
+            "want",
+            "because",
+            "any",
+            "these",
+            "give",
+            "day",
+            "most",
+            "us",
+        ]
+        return word in top100EnglishWords
+
+
