@@ -54,6 +54,16 @@ class Emoji:
         else:
             return uword
 
+    @staticmethod
+    def matchAllAndTranslate(word):
+        allTranslatedMatches = []
+        matches = Emoji.emojiMatch(uword)
+        if matches:
+            for match in matches:
+                allTranslatedMatches.append(Emoji.translate(match))
+        return allTranslatedMatches
+
+
 class Reaction:
     def __init__(self, reactJson, speaker):
         self._reaction = REACTION_MAP[reactJson["reaction"]]
@@ -147,14 +157,26 @@ class Message:
 
     def parseMessage(self, text):
         bagOfWords = text.split()
-        # Handle emoticons e.g. :D -___- :| D:
-        # Handle repeated emojis "\u00f0\u009f\u0098\u008b\u00f0\u009f\u0098\u008b\u00f0\u009f\u0098\u008b"
-        # Check mentions
-        pattern = re.compile('[\W_]+')
-        self._bagOfWords = map((lambda x: repr(x)), bagOfWords)
-        # self._bagOfWords = map((lambda x: pattern.sub('', x.lower())), bagOfWords)
-        # TODO combine lower and emoji and other parsing
+        # Handle emoticons e.g. :D :| D:
+        self._bagOfWords = [word for  sublist in map((lambda x: Message.formatWord(x)), bagOfWords) for word in sublist]
 
+
+    @staticmethod
+    def formatWord(text):
+        emojis = Emoji.emojiMatch(repr(text))
+        translatedEmojis = map(lambda x: Emoji.translate(x), emojis)
+        for emoji in emojis:
+            text.replace(emoji, " ")
+        remainingWords = text.split()
+        nonAlphaNumericWords = []
+        for word in remainingWords:
+            if re.match('^[^a-zA-Z0-9]+$', word):
+                nonAlphaNumericWords.append(word)
+
+        pattern = re.compile('[\W_]+')
+        formattedWords = map((lambda x: pattern.sub('', x.lower())), remainingWords)
+        ret = filter(lambda x: len(x) > 0, formattedWords) + translatedEmojis + nonAlphaNumericWords
+        return ret
 
     def getWords(self):
         return self._bagOfWords

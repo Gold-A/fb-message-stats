@@ -1,5 +1,5 @@
 import unittest
-from message import Message
+from message import Message, Emoji, MsgType
 from person import Person
 import json
 
@@ -23,12 +23,26 @@ def buildMessageJson(insert):
     return json.loads(sampleJson)
 
 
+class TestEmoji(unittest.TestCase):
+
+    def test_matchEmoji(self):
+        testText = \
+            "friend\\xf0\\x9f\\xa4\\x94\\xf0\\x9f\\xa4\\x94\\xf0\\x9f\\x98\\x90,"
+        result = Emoji.emojiMatch(testText)
+        self.assertItemsEqual(result, ["\\xf0\\x9f\\xa4\\x94", "\\xf0\\x9f\\xa4\\x94", "\\xf0\\x9f\\x98\\x90"])
+
+
 class TestMessage(unittest.TestCase):
 
     def test_getWords(self):
-        testMessage = Message(buildMessageJson("\"content\": \"Hello there friend\","))
+        testMessage = Message(buildMessageJson(
+            # "\"content\": \"Hello there friend\\xf0\\x9f\\xa4\\x94\\xf0\\x9f\\xa4\\x94\\xf0\\x9f\\x98\\x90\","
+            "\"content\": \"They're there -___- friend\u00f0\u009f\u00a4\u0094\u00f0\u009f\u00a4\u0094\u00f0\u009f\u0098\u0090\","
+            # "\"content\": \"Hello there friend'ly -___-\","
+        ))
         result = testMessage.getWords()
-        self.assertItemsEqual(result, ["hello", "there", "friend"])
+        expected = ["theyre", "there", "friend", "*ChinScratch*", "*ChinScratch*", ":|", "-___-"]
+        self.assertItemsEqual(result, expected)
 
 
     def test_Name(self):
@@ -48,7 +62,7 @@ class TestMessage(unittest.TestCase):
         """
         testMessage = Message(buildMessageJson(gifs))
         self.assertEquals(testMessage.numGifs(), 1)
-        self.assertEquals(testMessage.getType(), message.MsgType.GIF)
+        self.assertEquals(testMessage.getType(), MsgType.GIF)
 
 
     def test_Stickers(self):
@@ -60,7 +74,7 @@ class TestMessage(unittest.TestCase):
         """
         testMessage = Message(buildMessageJson(sticker))
         self.assertTrue(testMessage.isSticker())
-        self.assertEquals(testMessage.getType(), message.MsgType.STICKER)
+        self.assertEquals(testMessage.getType(), MsgType.STICKER)
 
 
 
@@ -79,7 +93,7 @@ class TestMessage(unittest.TestCase):
         """
         testMessage = Message(buildMessageJson(photos))
         self.assertEquals(testMessage.numPhotos(), 2)
-        self.assertEquals(testMessage.getType(), message.MsgType.PHOTO)
+        self.assertEquals(testMessage.getType(), MsgType.PHOTO)
 
 
 
@@ -106,7 +120,7 @@ class TestMessage(unittest.TestCase):
         """
         testMessage = Message(buildMessageJson(videos))
         self.assertEquals(testMessage.numVideos(), 2)
-        self.assertEquals(testMessage.getType(), message.MsgType.VIDEO)
+        self.assertEquals(testMessage.getType(), MsgType.VIDEO)
 
 
 
@@ -124,7 +138,7 @@ class TestMessage(unittest.TestCase):
         """)
         testMessage = Message(typeshare)
         self.assertTrue(testMessage.hasShare())
-        self.assertEquals(testMessage.getType(), message.MsgType.SHARE)
+        self.assertEquals(testMessage.getType(), MsgType.SHARE)
         impliedShare = json.loads("""
         {
             "sender_name": "Jane Jones",
@@ -135,11 +149,11 @@ class TestMessage(unittest.TestCase):
         """)
         testMessage2 = Message(impliedShare)
         self.assertTrue(testMessage2.hasShare())
-        self.assertEquals(testMessage2.getType(), message.MsgType.SHARE)
+        self.assertEquals(testMessage2.getType(), MsgType.SHARE)
 
 
     def test_Unicode(self):
-        matches = Message.unicodeMatch(repr(u'\xf0\x9f\x98\xae\xf0\x9f\x98\xae'))
+        matches = Emoji.emojiMatch(repr(u'\xf0\x9f\x98\xae\xf0\x9f\x98\xae'))
 
         self.assertItemsEqual(matches, ["\\xf0\\x9f\\x98\\xae", "\\xf0\\x9f\\x98\\xae"])
 
