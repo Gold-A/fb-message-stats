@@ -2,6 +2,7 @@ from message import Message
 from person import Person
 from reactionGraph import ReactionGraph
 import datetime
+import csv
 
 class Group:
     def __init__(self, allMessages):
@@ -28,7 +29,6 @@ class Group:
             self._messageTimeline.append((message.getUnixTime(), senderName))
 
             self._membersByName[senderName].addMessage(message)
-            print senderName
             if senderName == lastSender:
                 numConsecutive += 1
             elif lastSender in self._membersByName:
@@ -216,3 +216,54 @@ class Group:
         for person in self._members:
             name = person.getName()
             print("%s: %s %s" % (name, person.getDateFirstMessage(), person.getFirstMessage()))
+
+
+    def outputCSV(self, outputFolder):
+
+        with open(outputFolder + '/statsMonth.csv', 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            csvwriter.writerow(["SENDER","J","F","M","A","M","J","J","A","S","O","N","D"])
+            for person in self._members:
+                name = person.getName()
+                month = person.monthHistogram()
+                row = [name]
+                for k, v in month.iteritems():
+                    row.append(v)
+                csvwriter.writerow(row)
+        with open(outputFolder + '/statsHour.csv', 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            header = ["SENDER"] + range(24)
+            csvwriter.writerow(header)
+            for person in self._members:
+                name = person.getName()
+                hour = person.hourHistogram()
+                row = [name]
+                for k, v in hour.iteritems():
+                    row.append(v)
+                csvwriter.writerow(row)
+        with open(outputFolder + '/statsWeek.csv', 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            header = ["SENDER", "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+            csvwriter.writerow(header)
+            for person in self._members:
+                name = person.getName()
+                week = person.weekHistogram()
+                row = [name, week["Su"], week["M"], week["Tu"], week["W"], week["Th"], week["F"], week["Sa"]]
+                csvwriter.writerow(row)
+        with open(outputFolder + "/basicStats.csv", 'wb') as csvfile:
+            header = ["SENDER", "MESSAGE_COUNT", "WORD_COUNT", "GIFS_SENT", "PHOTOS_SENT", "VIDEOS_SENT"]
+            header += ["LINKS_SENT", "AVERAGE_MESSAGE_LENGTH"]
+            csvwriter = csv.DictWriter(csvfile, fieldnames=header, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            csvwriter.writeheader()
+            for person in self._members:
+                row = {
+                    "SENDER": person.getName(),
+                    "MESSAGE_COUNT": person.messageCount(),
+                    "WORD_COUNT": person.wordCount(),
+                    "GIFS_SENT": person.numGifsSent(),
+                    "PHOTOS_SENT": person.numPhotosSent(),
+                    "VIDEOS_SENT": person.numVideosSent(),
+                    "LINKS_SENT": person.numLinksSent(),
+                    "AVERAGE_MESSAGE_LENGTH": "%.2f" % (float(person.numWordsSent()) / person.numMessagesSent())
+                }
+                csvwriter.writerow(row)                

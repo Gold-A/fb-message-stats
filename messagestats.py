@@ -18,6 +18,8 @@ def main():
 
     group.printStats()
 
+    if len(sys.argv) == 3:
+        group.outputCSV(sys.argv[2])
 
 main()
 
