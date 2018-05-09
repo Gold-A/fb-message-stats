@@ -1,14 +1,15 @@
 import unittest
 from message import Message, Emoji, MsgType
 from person import Person
+from group import Group
 import json
 
-def buildMessageJson(insert):
+def buildMessageJsonName(name, insert):
     sampleJson = """
     {
-      "sender_name": "John Smith",
+      "sender_name": "%s",
       "timestamp": 1523824963,
-    """ + \
+    """ % name + \
     insert + \
     """
       "reactions": [
@@ -21,6 +22,30 @@ def buildMessageJson(insert):
     }
     """
     return json.loads(sampleJson)
+
+def buildMessageJson(insert):
+    return buildMessageJsonName("John Smith", insert)
+
+
+class TestGroup(unittest.TestCase):
+    def test_consecutive(self):
+        messages = []
+        messages.append(buildMessageJsonName("A", "\"content\": \"a\","))
+        messages.append(buildMessageJsonName("A", "\"content\": \"a\","))
+        messages.append(buildMessageJsonName("A", "\"content\": \"a\","))
+        messages.append(buildMessageJsonName("A", "\"content\": \"a\","))
+        messages.append(buildMessageJsonName("B", "\"content\": \"a\","))
+        messages.append(buildMessageJsonName("A", "\"content\": \"a\","))
+        messages.append(buildMessageJsonName("B", "\"content\": \"a\","))
+        messages.append(buildMessageJsonName("B", "\"content\": \"a\","))
+        messages.append(buildMessageJsonName("A", "\"content\": \"a\","))
+        messages.append(buildMessageJsonName("A", "\"content\": \"a\","))
+        group = Group(messages)
+        members = group.getMembersWithNames()
+        AConsecutive = members["A"].getConsecutiveCount()
+        self.assertItemsEqual(AConsecutive, [4, 1, 2])
+        BConsecutive = members["B"].getConsecutiveCount()
+        self.assertItemsEqual(BConsecutive, [1, 2])
 
 
 class TestEmoji(unittest.TestCase):
@@ -36,9 +61,7 @@ class TestMessage(unittest.TestCase):
 
     def test_getWords(self):
         testMessage = Message(buildMessageJson(
-            # "\"content\": \"Hello there friend\\xf0\\x9f\\xa4\\x94\\xf0\\x9f\\xa4\\x94\\xf0\\x9f\\x98\\x90\","
             "\"content\": \"They're there -___- friend\u00f0\u009f\u00a4\u0094\u00f0\u009f\u00a4\u0094\u00f0\u009f\u0098\u0090\","
-            # "\"content\": \"Hello there friend'ly -___-\","
         ))
         result = testMessage.getWords()
         expected = ["theyre", "there", "friend", "\\xf0\\x9f\\xa4\\x94", "\\xf0\\x9f\\xa4\\x94", "\\xf0\\x9f\\x98\\x90", "-___-"]

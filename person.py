@@ -16,7 +16,7 @@ class Person:
         self._linksSent = 0
         self._dateOfFirstMessage = datetime.datetime.max
         self._firstMessage = ""
-
+        self._consecutiveMessages = []
 
     def getName(self):
         return self._name
@@ -62,6 +62,12 @@ class Person:
             self._dateOfFirstMessage = msgDate
             self._firstMessage = msg.getContent()
 
+
+    def addConsecutiveCount(self, num):
+        self._consecutiveMessages.append(num)
+
+    def getConsecutiveCount(self):
+        return self._consecutiveMessages
 
     def numMessagesSent(self):
         return len(self._messagesSent)

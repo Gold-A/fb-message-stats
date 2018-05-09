@@ -248,6 +248,10 @@ class Message:
         return self._date
 
 
+    def getUnixTime(self):
+        return self._date.strftime("%s")
+
+
     def getContent(self):
         if self._text != "":
             return self._text

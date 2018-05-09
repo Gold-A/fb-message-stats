@@ -10,6 +10,10 @@ class Group:
         self._allMessages = []
         self._messageHist = {}
         self._emojiHist = {}
+        self._messageTimeline = []
+
+        lastSender = ""
+        numConsecutive = 1
         for msgJson in allMessages:
             if msgJson["type"] != "Generic" and msgJson["type"] != "Share":
                 continue
@@ -21,7 +25,17 @@ class Group:
                 self._membersByName[senderName] = newPerson
                 self.addMember(newPerson)
 
+            self._messageTimeline.append((message.getUnixTime(), senderName))
+
             self._membersByName[senderName].addMessage(message)
+            print senderName
+            if senderName == lastSender:
+                numConsecutive += 1
+            elif lastSender in self._membersByName:
+                self._membersByName[lastSender].addConsecutiveCount(numConsecutive)
+                numConsecutive = 1
+            lastSender = senderName
+        self._membersByName[senderName].addConsecutiveCount(numConsecutive)
 
         for name, person in self._membersByName.iteritems():
             self._messageHist[name] = person.messageCount()
@@ -34,6 +48,10 @@ class Group:
 
     def getMembers(self):
         return self._members
+
+
+    def getMembersWithNames(self):
+        return self._membersByName
 
 
     def emojiHist(self):
