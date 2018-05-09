@@ -18,6 +18,8 @@ class ReactionGraph:
 
     def totalReacts(self, graph, usr, reaction):
         count = 0
+        if usr not in graph:
+            return count
         for s, reactions in graph[usr].iteritems():
             if reaction in reactions:
                 count += reactions[reaction]
@@ -81,10 +83,14 @@ class ReactionGraph:
 
 
     def printReaction(self, rg, reaction):
-        self.printReactionNormalized(rg, None, reaction)
-
+        for a in self.reactionNormalized(rg, None, reaction):
+            print("%s: %s" % (a["person"], a["count"]))
 
     def printReactionNormalized(self, rg, hist, reaction):
+        for a in self.reactionNormalized(rg, hist, reaction):
+            print("%s: %s" % (a["person"], a["count"]))
+    
+    def reactionNormalized(self, rg, hist, reaction):
         graph = {}
         if rg == "received":
             graph = self._reactsByReactee
@@ -93,11 +99,34 @@ class ReactionGraph:
         reactionHist = {}
         for r, s in graph.iteritems():
             reactionHist[r] = self.totalReacts(graph, r, reaction)
+        ret = []
         if hist == None:
             for r, count in sorted(reactionHist.iteritems(), key=lambda (k,v): (v,k), reverse=True):
                 if count > 0:
-                    print("%s: %s" % (r, count))
+                    ret.append({
+                        "person": r,
+                        "count": count,
+                    })
         else:
             for r, count in sorted(reactionHist.iteritems(), key=lambda (k,v): (float(v)/hist[k],k), reverse=True):
                 if count > 0:
-                    print("%s: %.2f%%" % (r, float(count*100)/hist[r]))
+                    ret.append({
+                        "person": r,
+                        "count": "%.2f%%" % (float(count*100)/hist[r]),
+                    })
+        return ret
+
+
+    def reactionsSentRecievedAndNormalizedByPerson(self, hist, person):
+        stats = {}
+        for _, reaction in REACTION_MAP.iteritems():
+            stat = 0
+            if person in self._reactsByReactee:
+                stat = self.totalReacts(self._reactsByReactee, person, reaction)
+            stats["%s_RECIEVED" % reaction] = stat
+
+            stat = 0
+            if person in self._reactsByReactor:
+                stat = self.totalReacts(self._reactsByReactor, person, reaction)
+            stats["%s_GIVEN" % reaction] = stat
+        return stats

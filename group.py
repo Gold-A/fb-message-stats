@@ -1,4 +1,4 @@
-from message import Message
+from message import Message, REACTION_MAP
 from person import Person
 from reactionGraph import ReactionGraph
 import datetime
@@ -219,7 +219,6 @@ class Group:
 
 
     def outputCSV(self, outputFolder):
-
         with open(outputFolder + '/statsMonth.csv', 'wb') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["SENDER","J","F","M","A","M","J","J","A","S","O","N","D"])
@@ -267,3 +266,18 @@ class Group:
                     "AVERAGE_MESSAGE_LENGTH": "%.2f" % (float(person.numWordsSent()) / person.numMessagesSent())
                 }
                 csvwriter.writerow(row)                
+        with open(outputFolder + "/reactionStats.csv", 'wb') as csvfile:
+            header = ["SENDER"]
+            for _, reaction in REACTION_MAP.iteritems():
+                header += ["%s_RECIEVED" % reaction, "%s_GIVEN" % reaction]
+            csvwriter = csv.DictWriter(csvfile, fieldnames=header, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            csvwriter.writeheader()
+            reactionGraph = ReactionGraph(self._allMessages)
+            reactionGraph.printStats(self._messageHist)
+            for person in self._members:
+                row = reactionGraph.reactionsSentRecievedAndNormalizedByPerson(self._messageHist, person.getName())
+                row["SENDER"] = person.getName()
+                csvwriter.writerow(row)
+
+
+
