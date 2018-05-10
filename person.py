@@ -69,6 +69,12 @@ class Person:
     def getConsecutiveCount(self):
         return self._consecutiveMessages
 
+    def getAverageConsecutiveCount(self):
+        count = 0
+        for x in self._consecutiveMessages:
+            count += x
+        return "%.2f" % (float(count) / len(self._consecutiveMessages))
+
     def numMessagesSent(self):
         return len(self._messagesSent)
 
@@ -112,6 +118,11 @@ class Person:
 
     def messageCount(self):
         return len(self._messagesSent)
+
+
+    def weekHistogramAsList(self):
+        week = self.weekHistogram()
+        return [week["Su"], week["M"], week["Tu"], week["W"], week["Th"], week["F"], week["Sa"]]
 
 
     def weekHistogram(self):
