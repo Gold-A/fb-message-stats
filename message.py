@@ -21,41 +21,40 @@ class Emoji:
         return result
 
     EMOJI_MAP = {
-        "\\xf0\\x9f\\xa4\\x94" : "*ChinScratch*",
-        "\\xf0\\x9f\\x8d\\x89" : "*Watermelon*",
-        "\\xf0\\x9f\\x98\\x82" : "*LaughingTears",
-        "\\xf0\\x9f\\x98\\xad" : "*Bawling*",
-        "\\xf0\\x9f\\x98\\x90" : ":|",
-        "\\xf0\\x9f\\x98\\xae" : ":O",
-        "\\xf0\\x9f\\x8e\\xa4" : "*Microphone*",
-        "\\xf0\\x9f\\x98\\x8d" : "*HeartEyes*",
-        "\\xf0\\x9f\\x98\\x83" : ":D",
-        "\\xf0\\x9f\\x98\\x9e" : ":(",
-        "\\xf0\\x9f\\x98\\x80" : "*GrinningFace*",
-        "\\xf0\\x9f\\x98\\xb5" : "*SpiralEyes*",
-        "\\xf0\\x9f\\x98\\xb1" : "*Scream*",
-        "\\xf0\\x9f\\x98\\x8e" : "*Sunglasses*",
-        "\\xf0\\x9f\\xa4\\xb7" : "*Shrug*",
-        "\\xf0\\x9f\\xa4\\x97" : "*HuggingFace*",
-        "\\xf0\\x9f\\x98\\x8f" : "*Smirk*",
-        "\\xf0\\x9f\\x98\\xb4" : "*ZZZFace*",
-        "\\xf0\\x9f\\x98\\x8b" : ":P",
-        "\\xf0\\x9f\\x98\\xb2" : "*Astonished*",
-        "\\xf0\\x9f\\x91\\x8c" : "*Okay*",
-        "\\xf0\\x9f\\x91\\x8d" : "*Thumbsup*",
-        "\\xf0\\x9f\\x91\\xb4" : "*Oldman*",
-        "\\xf0\\x9f\\x99\\x86" : "*OHands*",
-        "\\xf0\\x9f\\xa7\\x90" : "*Monicle*",
-        "\\xf0\\x9f\\x8e\\x82" : "*Cake*",
-        "\\xf0\\x9f\\x98\\x95" : ":S",
-        "\\xf0\\x9f\\x99\\x83" : "*UpsideDownSmile*",
-        "\\xf0\\x9f\\x94\\xa5" : "*Fire*",
-        "\\xf0\\x9f\\x98\\xb7" : "*MedicalMask*",
-        "\\xf0\\x9f\\x98\\x91" : "-_-",
-        "\\xf0\\x9f\\x91\\x8b" : "*Wave*",
-        "\\xf0\\x9f\\x98\\xa9" : "*WearyFace*",
+        "\\xf0\\x9f\\xa4\\x94": "*ChinScratch*",
+        "\\xf0\\x9f\\x8d\\x89": "*Watermelon*",
+        "\\xf0\\x9f\\x98\\x82": "*LaughingTears",
+        "\\xf0\\x9f\\x98\\xad": "*Bawling*",
+        "\\xf0\\x9f\\x98\\x90": ":|",
+        "\\xf0\\x9f\\x98\\xae": ":O",
+        "\\xf0\\x9f\\x8e\\xa4": "*Microphone*",
+        "\\xf0\\x9f\\x98\\x8d": "*HeartEyes*",
+        "\\xf0\\x9f\\x98\\x83": ":D",
+        "\\xf0\\x9f\\x98\\x9e": ":(",
+        "\\xf0\\x9f\\x98\\x80": "*GrinningFace*",
+        "\\xf0\\x9f\\x98\\xb5": "*SpiralEyes*",
+        "\\xf0\\x9f\\x98\\xb1": "*Scream*",
+        "\\xf0\\x9f\\x98\\x8e": "*Sunglasses*",
+        "\\xf0\\x9f\\xa4\\xb7": "*Shrug*",
+        "\\xf0\\x9f\\xa4\\x97": "*HuggingFace*",
+        "\\xf0\\x9f\\x98\\x8f": "*Smirk*",
+        "\\xf0\\x9f\\x98\\xb4": "*ZZZFace*",
+        "\\xf0\\x9f\\x98\\x8b": ":P",
+        "\\xf0\\x9f\\x98\\xb2": "*Astonished*",
+        "\\xf0\\x9f\\x91\\x8c": "*Okay*",
+        "\\xf0\\x9f\\x91\\x8d": "*Thumbsup*",
+        "\\xf0\\x9f\\x91\\xb4": "*Oldman*",
+        "\\xf0\\x9f\\x99\\x86": "*OHands*",
+        "\\xf0\\x9f\\xa7\\x90": "*Monicle*",
+        "\\xf0\\x9f\\x8e\\x82": "*Cake*",
+        "\\xf0\\x9f\\x98\\x95": ":S",
+        "\\xf0\\x9f\\x99\\x83": "*UpsideDownSmile*",
+        "\\xf0\\x9f\\x94\\xa5": "*Fire*",
+        "\\xf0\\x9f\\x98\\xb7": "*MedicalMask*",
+        "\\xf0\\x9f\\x98\\x91": "-_-",
+        "\\xf0\\x9f\\x91\\x8b": "*Wave*",
+        "\\xf0\\x9f\\x98\\xa9": "*WearyFace*",
     }
-
 
     @staticmethod
     def translate(uword):
@@ -67,7 +66,7 @@ class Emoji:
     @staticmethod
     def matchAllAndTranslate(word):
         allTranslatedMatches = []
-        matches = Emoji.emojiMatch(uword)
+        matches = Emoji.emojiMatch(word)
         if matches:
             for match in matches:
                 allTranslatedMatches.append(Emoji.translate(match))
@@ -80,14 +79,11 @@ class Reaction:
         self._actor = reactJson["actor"]
         self._speaker = speaker
 
-
     def getReactor(self):
         return self._actor
 
-
     def getReaction(self):
         return self._reaction
-
 
     def getSpeaker(self):
         return self._speaker
@@ -125,7 +121,7 @@ class Message:
             else:
                 self._type = MsgType.TEXT
             self.parseMessage(self._text)
-        
+
         if "gifs" in messageJson:
             self._type = MsgType.GIF
             self._numGifs = len(messageJson["gifs"])
@@ -156,14 +152,11 @@ class Message:
             for react in reacts:
                 self._reactions.append(Reaction(react, self._sender))
 
-
     def getSender(self):
         return self._sender
 
-
     def getReactions(self):
         return self._reactions
-
 
     def parseMessage(self, text):
         bagOfWords = text.split()
@@ -199,10 +192,8 @@ class Message:
         ret = filter(lambda x: len(x) > 0, formattedWords) + emojis + nonAlphaNumericWords
         return ret
 
-
     def getWords(self):
         return self._bagOfWords
-
 
     def getType(self):
         try:
@@ -211,52 +202,40 @@ class Message:
             print self._originalJsonForm
             raise e
 
-
     def numGifs(self):
         return self._numGifs
-
 
     def isSticker(self):
         return self._isSticker
 
-
     def numPhotos(self):
         return self._numPhotos
-
 
     def numVideos(self):
         return self._numVideos
 
-
     def hasShare(self):
         return self._hasShare
-
 
     def hour(self):
         return self._hourOfDay
 
-
     def weekday(self):
         return self._dayOfWeek
-
 
     def month(self):
         return self._month
 
-
     def getDate(self):
         return self._date
 
-
     def getUnixTime(self):
         return self._date.strftime("%s")
-
 
     def getContent(self):
         if self._text != "":
             return self._text
         return self._type
-
 
     @staticmethod
     def isBoringWord(word):
@@ -363,5 +342,3 @@ class Message:
             "us",
         ]
         return word in top100EnglishWords
-
-

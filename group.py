@@ -4,6 +4,7 @@ from reactionGraph import ReactionGraph
 import datetime
 import csv
 
+
 class Group:
     def __init__(self, allMessages):
         self._members = []
@@ -30,7 +31,6 @@ class Group:
             if message.getDate() < self._earliestMessage:
                 self._earliestMessage = message.getDate()
 
-
             self._membersByName[senderName].addMessage(message)
             if senderName == lastSender:
                 numConsecutive += 1
@@ -45,7 +45,6 @@ class Group:
         for name, person in self._membersByName.iteritems():
             self._messageHist[name] = person.numMessagesSent()
 
-
     def setMessageTimeLine(self):
         if len(self._messageTimeline) == 0:
             for message in self._allMessages:
@@ -59,19 +58,15 @@ class Group:
                 else:
                     self._messageTimelineByPerson[day][name] = 1
 
-
     def addMember(self, person):
         self._members.append(person)
         self._membersByName[person.getName()] = person
 
-
     def getMembers(self):
         return self._members
 
-
     def getMembersWithNames(self):
         return self._membersByName
-
 
     def emojiHist(self):
         if len(self._emojiHist) > 0:
@@ -85,67 +80,66 @@ class Group:
                     self._emojiHist[emoji] = count
         return self._emojiHist
 
-
     def printStats(self):
         intStats = [
             {
-                "title" : "Most Spammy (messages)",
-                "func" : lambda x: x.numMessagesSent()
+                "title": "Most Spammy (messages)",
+                "func": lambda x: x.numMessagesSent()
             },
             {
-                "title" : "Most Talkative (words)",
-                "func" : lambda x: x.wordCount()
+                "title": "Most Talkative (words)",
+                "func": lambda x: x.wordCount()
             },
             {
-                "title" : "GIFs Sent",
-                "func" : lambda x: x.numGifsSent()
+                "title": "GIFs Sent",
+                "func": lambda x: x.numGifsSent()
             },
             {
-                "title" : "Photos Sent",
-                "func" : lambda x: x.numPhotosSent()
+                "title": "Photos Sent",
+                "func": lambda x: x.numPhotosSent()
             },
             {
-                "title" : "Videos Sent",
-                "func" : lambda x: x.numVideosSent()
+                "title": "Videos Sent",
+                "func": lambda x: x.numVideosSent()
             },
             {
-                "title" : "Links Sent",
-                "func" : lambda x: x.numLinksSent()
+                "title": "Links Sent",
+                "func": lambda x: x.numLinksSent()
             },
         ]
 
         stats = [
             {
-                "title" : "Average words / message",
-                "func" : self.printAverageWordsPerMessage
+                "title": "Average words / message",
+                "func": self.printAverageWordsPerMessage
             },
             {
-                "title" : "Top Words",
-                "func" : self.printTopWords
+                "title": "Top Words",
+                "func": self.printTopWords
             },
             {
-                "title" : "Emoji",
-                "func" : self.printEmoji
+                "title": "Emoji",
+                "func": self.printEmoji
             },
             {
-                "title" : "Hour",
-                "func" : self.printHour
+                "title": "Hour",
+                "func": self.printHour
             },
             {
-                "title" : "Week",
-                "func" : self.printWeek
+                "title": "Week",
+                "func": self.printWeek
             },
             {
-                "title" : "Month",
-                "func" : self.printMonth
+                "title": "Month",
+                "func": self.printMonth
             },
             {
-                "title" : "FIRST MESSAGE",
-                "func" : self.printFirstMessage
+                "title": "FIRST MESSAGE",
+                "func": self.printFirstMessage
             },
             {
-                "title" : "Total Emojis",
-                "func" : self.printTotalEmoji
+                "title": "Total Emojis",
+                "func": self.printTotalEmoji
             },
 
         ]
@@ -159,12 +153,10 @@ class Group:
         reactionGraph = ReactionGraph(self._allMessages)
         reactionGraph.printStats(self._messageHist)
 
-
     def printStat(self, title, fnc):
         print("~~%s~~" % title)
         fnc()
         print("\n")
-
 
     def printIntegerStatSorted(self, title, fnc):
         print("~~%s~~" % title)
@@ -173,30 +165,24 @@ class Group:
             print("%s: %s" % (name, fnc(person)))
         print("\n")
 
-
-
     def printAverageWordsPerMessage(self):
         for person in sorted(self._members, key=lambda x: (x.numWordsSent() / x.numMessagesSent())):
             name = person.getName()
             print("%s: %.2f" % (name, float(person.numWordsSent()) / person.numMessagesSent()))
 
-
     def printTotalEmoji(self):
         for emoji, count in sorted(self.emojiHist().iteritems(), key=lambda (k, v): (v, k), reverse=True)[:10]:
             print("%s, %d" % (emoji, count))
-
 
     def printTopWords(self):
         for person in self._members:
             name = person.getName()
             print("%s: %s" % (name, person.topWords(5)))
 
-
     def printEmoji(self):
         for person in self._members:
             name = person.getName()
             print("%s: %s" % (name, person.emojisSent()))
-
 
     def printWeek(self):
         print("SENDER\tSUN\tMON\tTUE\tWED\tTHU\tFRI\tSAT")
@@ -204,7 +190,6 @@ class Group:
             name = person.getName()
             week = person.weekHistogram()
             print("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (name.split()[0], week["Su"], week["M"], week["Tu"], week["W"], week["Th"], week["F"], week["Sa"]))
-
 
     def printMonth(self):
         print("SENDER\tJ\tF\tM\tA\tM\tJ\tJ\tA\tS\tO\tN\tD")
@@ -216,7 +201,6 @@ class Group:
                 monthStr += ("\t" + str(v))
             print monthStr
 
-        
     def printHour(self):
         hourheader = "SENDER"
         for i in range(24):
@@ -230,12 +214,10 @@ class Group:
                 hourStr += ("\t" + str(v))
             print hourStr
 
-
     def printFirstMessage(self):
         for person in self._members:
             name = person.getName()
             print("%s: %s %s" % (name, person.getDateFirstMessage(), person.getFirstMessage()))
-
 
     def outputCSV(self, outputFolder):
         with open(outputFolder + '/statsMonth.csv', 'wb') as csvfile:
@@ -307,7 +289,7 @@ class Group:
                     "STICKERS_SENT": person.numStickersSent(),
                     "LINKS_SENT": person.numLinksSent(),
                 }
-                csvwriter.writerow(row)                
+                csvwriter.writerow(row)
         with open(outputFolder + "/reactionStats.csv", 'wb') as csvfile:
             header = ["SENDER"]
             for _, reaction in REACTION_MAP.iteritems():
@@ -334,7 +316,6 @@ class Group:
             csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             timeline = self._messageTimelineByPerson
             csvwriter.writerow(["SENDER"] + timeline.keys())
-            
             for person in self._members:
                 name = person.getName()
                 row = [name]
@@ -346,6 +327,18 @@ class Group:
                         cumulative += 0
                     row += [cumulative]
                 csvwriter.writerow(row)
-
-
-
+        with open(outputFolder + "/topStats.csv", 'wb') as csvfile:
+            header = ["SENDER", "#1", "Count", "#2", "Count"]
+            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            csvwriter.writerow(header)
+            for person in self._members:
+                name = person.getName()
+                row = [name]
+                emojis = person.emojisSent()
+                if len(emojis) == 1:
+                    row += [emojis[0][0], emojis[0][1], "", 0]
+                elif len(emojis) > 1:
+                    row += [emojis[0][0], emojis[0][1], emojis[1][0], emojis[1][1]]
+                else:
+                    row += ["", 0, "", 0]
+                csvwriter.writerow(row)
