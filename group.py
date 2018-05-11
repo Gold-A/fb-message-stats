@@ -13,7 +13,7 @@ class Group:
         self._emojiHist = {}
         self._messageTimeline = []
         self._earliestMessage = datetime.datetime.max
-        self._messageTimelineByPerson = []
+        self._messageTimelineByPerson = {}
         lastSender = ""
         numConsecutive = 1
         for msgJson in allMessages:
@@ -40,16 +40,24 @@ class Group:
             lastSender = senderName
         self._membersByName[senderName].addConsecutiveCount(numConsecutive)
 
+        self.setMessageTimeLine()
+
         for name, person in self._membersByName.iteritems():
             self._messageHist[name] = person.numMessagesSent()
 
 
-    def getMessageTimeLine(self):
+    def setMessageTimeLine(self):
         if len(self._messageTimeline) == 0:
             for message in self._allMessages:
-                days = (message.getDate() - self._earliestMessage).days
-                self._messageTimeline.append((days, message.getSender()))
-        return self._messageTimeline
+                day = (message.getDate() - self._earliestMessage).days
+                name = message.getSender()
+                self._messageTimeline.append((day, name))
+                if day not in self._messageTimelineByPerson:
+                    self._messageTimelineByPerson[day] = {}
+                if name in self._messageTimelineByPerson[day]:
+                    self._messageTimelineByPerson[day][name] += 1
+                else:
+                    self._messageTimelineByPerson[day][name] = 1
 
 
     def addMember(self, person):
@@ -246,7 +254,7 @@ class Group:
                 month = person.monthHistogram()
                 row = [name]
                 for k, v in month.iteritems():
-                    row.append((v * 100) / person.numMessagesSent())
+                    row.append("%.1f" % ((v * 100) / person.numMessagesSent()))
                 csvwriter.writerow(row)
         with open(outputFolder + '/statsHour.csv', 'wb') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -264,7 +272,7 @@ class Group:
                 hour = person.hourHistogram()
                 row = [name]
                 for k, v in hour.iteritems():
-                    row.append((v * 100) / person.numMessagesSent())
+                    row.append("%.1f" % ((v * 100) / person.numMessagesSent()))
                 csvwriter.writerow(row)
         with open(outputFolder + '/statsWeek.csv', 'wb') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -278,7 +286,7 @@ class Group:
             for person in self._members:
                 name = person.getName()
                 week = person.weekHistogramAsList()
-                normalizedWeek = map((lambda x: (x * 100) / person.numMessagesSent()), week)
+                normalizedWeek = map((lambda x: "%.1f" % ((x * 100) / person.numMessagesSent())), week)
                 row = [name] + normalizedWeek
                 csvwriter.writerow(row)
         with open(outputFolder + "/basicStats.csv", 'wb') as csvfile:
@@ -307,7 +315,6 @@ class Group:
             csvwriter = csv.DictWriter(csvfile, fieldnames=header, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writeheader()
             reactionGraph = ReactionGraph(self._allMessages)
-            reactionGraph.printStats(self._messageHist)
             for person in self._members:
                 row = reactionGraph.reactionsSentRecievedAndNormalizedByPerson(self._messageHist, person.getName())
                 row["SENDER"] = person.getName()
@@ -316,12 +323,29 @@ class Group:
             csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             personIndex = {}
             index = 0
-            for (msgTime, sender) in self.getMessageTimeLine():
+            for (msgTime, sender) in self._messageTimeline:
                 if sender not in personIndex:
                     personIndex[sender] = index
                     index += 1
                 csvwriter.writerow([msgTime, personIndex[sender]])
             for p, i in personIndex.iteritems():
                 csvwriter.writerow([p, i])
+        with open(outputFolder + '/timelineStats.csv', 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            timeline = self._messageTimelineByPerson
+            csvwriter.writerow(["SENDER"] + timeline.keys())
+            
+            for person in self._members:
+                name = person.getName()
+                row = [name]
+                cumulative = 0
+                for day, details in timeline.iteritems():
+                    if name in details:
+                        cumulative += details[name]
+                    else:
+                        cumulative += 0
+                    row += [cumulative]
+                csvwriter.writerow(row)
+
 
 
