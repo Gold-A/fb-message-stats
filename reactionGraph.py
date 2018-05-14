@@ -83,12 +83,12 @@ class ReactionGraph:
 
 
     def printReaction(self, rg, reaction):
-        for a in self.reactionNormalized(rg, None, reaction):
-            print("%s: %s" % (a["person"], a["count"]))
+        for person, count in self.reactionNormalized(rg, None, reaction).iteritems():
+            print("%s: %s" % (person, count))
 
     def printReactionNormalized(self, rg, hist, reaction):
-        for a in self.reactionNormalized(rg, hist, reaction):
-            print("%s: %s" % (a["person"], a["count"]))
+        for person, count in self.reactionNormalized(rg, hist, reaction).iteritems():
+            print("%s: %s" % (person, count))
     
     def reactionNormalized(self, rg, hist, reaction):
         graph = {}
@@ -99,21 +99,15 @@ class ReactionGraph:
         reactionHist = {}
         for r, s in graph.iteritems():
             reactionHist[r] = self.totalReacts(graph, r, reaction)
-        ret = []
+        ret = {}
         if hist == None:
             for r, count in sorted(reactionHist.iteritems(), key=lambda (k,v): (v,k), reverse=True):
                 if count > 0:
-                    ret.append({
-                        "person": r,
-                        "count": count,
-                    })
+                    ret[r] = count
         else:
             for r, count in sorted(reactionHist.iteritems(), key=lambda (k,v): (float(v)/hist[k],k), reverse=True):
                 if count > 0:
-                    ret.append({
-                        "person": r,
-                        "count": "%.2f%%" % (float(count*100)/hist[r]),
-                    })
+                    ret[r] = "%.2f%%" % (float(count*100)/hist[r])
         return ret
 
 
@@ -124,6 +118,12 @@ class ReactionGraph:
             if person in self._reactsByReactee:
                 stat = self.totalReacts(self._reactsByReactee, person, reaction)
             stats["%s_RECIEVED" % reaction] = stat
+
+            stat = 0
+            normalized = self.reactionNormalized("received", hist, reaction)
+            if person in normalized:
+                stat = normalized[person]
+            stats["%s_RECIEVED_NORMALIZED" % reaction] = stat
 
             stat = 0
             if person in self._reactsByReactor:

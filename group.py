@@ -1,4 +1,4 @@
-from message import Message, REACTION_MAP
+from message import Message, REACTION_MAP, Emoji
 from person import Person
 from reactionGraph import ReactionGraph
 import datetime
@@ -17,11 +17,14 @@ class Group:
         self._messageTimelineByPerson = {}
         lastSender = ""
         numConsecutive = 1
+        self._wordHist = {}
+
         for msgJson in allMessages:
             if msgJson["type"] != "Generic" and msgJson["type"] != "Share":
                 continue
             message = Message(msgJson)
             self._allMessages.append(message)
+            self.addToWordHist(message.getWords())
             senderName = message.getSender()
             if senderName not in self._membersByName:
                 newPerson = Person(senderName)
@@ -44,6 +47,14 @@ class Group:
 
         for name, person in self._membersByName.iteritems():
             self._messageHist[name] = person.numMessagesSent()
+
+    def addToWordHist(self, words):
+        for word in words:
+            translated = Emoji.translate(word)
+            if word in self._wordHist:
+                self._wordHist[word] += 1
+            else:
+                self._wordHist[word] = 1
 
     def setMessageTimeLine(self):
         if len(self._messageTimeline) == 0:
@@ -192,12 +203,16 @@ class Group:
             print("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (name.split()[0], week["Su"], week["M"], week["Tu"], week["W"], week["Th"], week["F"], week["Sa"]))
 
     def printMonth(self):
-        print("SENDER\tJ\tF\tM\tA\tM\tJ\tJ\tA\tS\tO\tN\tD")
+        monthheader = "SENDER"
+        for y in range(2017, 2019):
+            for m in range(1, 13):
+                monthheader += "\t" +  "%s/%02d" % (y, m)
+        print monthheader
         for person in self._members:
             name = person.getName()
-            month = person.monthHistogram()
+            month = sorted(person.monthHistogram().iteritems())
             monthStr = name.split()[0]
-            for k, v in month.iteritems():
+            for (k, v) in month:
                 monthStr += ("\t" + str(v))
             print monthStr
 
@@ -222,20 +237,26 @@ class Group:
     def outputCSV(self, outputFolder):
         with open(outputFolder + '/statsMonth.csv', 'wb') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            csvwriter.writerow(["SENDER","J","F","M","A","M","J","J","A","S","O","N","D"])
+
+            monthheader = ["SENDER"]
+            for y in range(2017, 2019):
+                for m in range(1, 13):
+                    monthheader += ["%s/%02d" % (y, m)]
+            csvwriter.writerow(monthheader)
+   
             for person in self._members:
                 name = person.getName()
-                month = person.monthHistogram()
+                month = sorted(person.monthHistogram().iteritems())
                 row = [name]
-                for k, v in month.iteritems():
+                for (k, v) in month:
                     row.append(v)
                 csvwriter.writerow(row)
             # Normalized as a percentage of total messages
             for person in self._members:
                 name = person.getName()
-                month = person.monthHistogram()
+                month = sorted(person.monthHistogram().iteritems())
                 row = [name]
-                for k, v in month.iteritems():
+                for (k, v) in month:
                     row.append("%.2f" % (float(v * 100) / person.numMessagesSent()))
                 csvwriter.writerow(row)
         with open(outputFolder + '/statsHour.csv', 'wb') as csvfile:
@@ -293,7 +314,7 @@ class Group:
         with open(outputFolder + "/reactionStats.csv", 'wb') as csvfile:
             header = ["SENDER"]
             for _, reaction in REACTION_MAP.iteritems():
-                header += ["%s_RECIEVED" % reaction, "%s_GIVEN" % reaction]
+                header += ["%s_RECIEVED" % reaction, "%s_RECIEVED_NORMALIZED" % reaction, "%s_GIVEN" % reaction]
             csvwriter = csv.DictWriter(csvfile, fieldnames=header, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writeheader()
             reactionGraph = ReactionGraph(self._allMessages)
@@ -342,3 +363,9 @@ class Group:
                 else:
                     row += ["", 0, "", 0]
                 csvwriter.writerow(row)
+        with open(outputFolder + '/wordCloud.csv', 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            filtered = filter(lambda (k,v): not Message.isBoringWord(k), self._wordHist.iteritems())
+            topWords = sorted(filtered, key=lambda (k,v): (v,k), reverse=True)
+            for (word, count) in topWords[:200]:
+                csvwriter.writerow([word, count])

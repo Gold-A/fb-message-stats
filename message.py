@@ -146,6 +146,7 @@ class Message:
         self._dayOfWeek = self._date.weekday()
         self._hourOfDay = self._date.hour
         self._month = self._date.month
+        self._year = self._date.year
 
         if "reactions" in messageJson:
             reacts = messageJson["reactions"]
@@ -225,6 +226,9 @@ class Message:
 
     def month(self):
         return self._month
+
+    def year(self):
+        return self._year
 
     def getDate(self):
         return self._date

@@ -139,11 +139,16 @@ class Person:
 
     def monthHistogram(self):
         hist = {}
-        for i in range(12):
-            hist[i+1] = 0
+
+        for y in range(2017, 2019):
+            for m in range(1, 13):
+                date = "%s/%02d" % (y, m)
+                hist[date] = 0  
+
 
         for msg in self._messagesSent:
-            hist[msg.month()] += 1
+            date = "%s/%02d" % (msg.year(), msg.month())
+            hist[date] += 1
 
         return hist
 
