@@ -21,7 +21,6 @@ class Person:
     def getName(self):
         return self._name
 
-
     def addMessage(self, msg):
         self._messagesSent.append(msg)
         for word in msg.getWords():
@@ -62,7 +61,6 @@ class Person:
             self._dateOfFirstMessage = msgDate
             self._firstMessage = msg.getContent()
 
-
     def addConsecutiveCount(self, num):
         self._consecutiveMessages.append(num)
 
@@ -78,52 +76,41 @@ class Person:
     def numMessagesSent(self):
         return len(self._messagesSent)
 
-
     def numWordsSent(self):
         return self._totalWordCount
 
     
     def numGifsSent(self):
         return self._gifsSent
-    
 
     def numStickersSent(self):
         return self._stickersSent
-    
 
     def numPhotosSent(self):
         return self._photosSent
-    
 
     def numVideosSent(self):
         return self._videosSent
-    
 
     def numLinksSent(self):
         return self._linksSent
-
 
     def topWords(self, x):
         filtered = filter(lambda (k,v): not Message.isBoringWord(k), self._wordsSent.iteritems())
         return sorted(filtered, key=lambda (k,v): (v,k), reverse=True)[:x]
 
-
     def emojisSent(self):
         return sorted(self._emojisSent.iteritems(), key=lambda (k,v): (v,k), reverse=True)
-
 
     def wordCount(self):
         return self._totalWordCount
 
-
     def messageCount(self):
         return len(self._messagesSent)
-
 
     def weekHistogramAsList(self):
         week = self.weekHistogram()
         return [week["Su"], week["M"], week["Tu"], week["W"], week["Th"], week["F"], week["Sa"]]
-
 
     def weekHistogram(self):
         WEEK = {
@@ -150,7 +137,6 @@ class Person:
 
         return hist
 
-
     def monthHistogram(self):
         hist = {}
         for i in range(12):
@@ -160,7 +146,6 @@ class Person:
             hist[msg.month()] += 1
 
         return hist
-
 
     def hourHistogram(self):
         hist = {}
@@ -172,10 +157,8 @@ class Person:
 
         return hist
 
-
     def getDateFirstMessage(self):
         return self._dateOfFirstMessage.isoformat()
-
 
     def getFirstMessage(self):
         return self._firstMessage

@@ -236,7 +236,7 @@ class Group:
                 month = person.monthHistogram()
                 row = [name]
                 for k, v in month.iteritems():
-                    row.append("%.1f" % ((v * 100) / person.numMessagesSent()))
+                    row.append("%.2f" % (float(v * 100) / person.numMessagesSent()))
                 csvwriter.writerow(row)
         with open(outputFolder + '/statsHour.csv', 'wb') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -254,7 +254,7 @@ class Group:
                 hour = person.hourHistogram()
                 row = [name]
                 for k, v in hour.iteritems():
-                    row.append("%.1f" % ((v * 100) / person.numMessagesSent()))
+                    row.append("%.2f" % (float(v * 100) / person.numMessagesSent()))
                 csvwriter.writerow(row)
         with open(outputFolder + '/statsWeek.csv', 'wb') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -268,7 +268,7 @@ class Group:
             for person in self._members:
                 name = person.getName()
                 week = person.weekHistogramAsList()
-                normalizedWeek = map((lambda x: "%.1f" % ((x * 100) / person.numMessagesSent())), week)
+                normalizedWeek = map((lambda x: "%.2f" % (float(x * 100) / person.numMessagesSent())), week)
                 row = [name] + normalizedWeek
                 csvwriter.writerow(row)
         with open(outputFolder + "/basicStats.csv", 'wb') as csvfile:
