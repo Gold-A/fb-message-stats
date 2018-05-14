@@ -165,5 +165,8 @@ class Person:
     def getDateFirstMessage(self):
         return self._dateOfFirstMessage.isoformat()
 
+    def getDateFirstMessageDate(self):
+        return self._dateOfFirstMessage
+
     def getFirstMessage(self):
         return self._firstMessage

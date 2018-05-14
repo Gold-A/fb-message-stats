@@ -14,6 +14,7 @@ class Group:
         self._emojiHist = {}
         self._messageTimeline = []
         self._earliestMessage = datetime.datetime.max
+        self._latestMessage = datetime.datetime.min
         self._messageTimelineByPerson = {}
         lastSender = ""
         numConsecutive = 1
@@ -33,6 +34,8 @@ class Group:
 
             if message.getDate() < self._earliestMessage:
                 self._earliestMessage = message.getDate()
+            if message.getDate() > self._latestMessage:
+                self._latestMessage = message.getDate()
 
             self._membersByName[senderName].addMessage(message)
             if senderName == lastSender:
@@ -96,6 +99,9 @@ class Group:
             {
                 "title": "Most Spammy (messages)",
                 "func": lambda x: x.numMessagesSent()
+            },            {
+                "title": "Words / day",
+                "func": lambda x: x.wordCount() / (self._latestMessage - x.getDateFirstMessageDate()).days
             },
             {
                 "title": "Most Talkative (words)",
@@ -188,7 +194,7 @@ class Group:
     def printTopWords(self):
         for person in self._members:
             name = person.getName()
-            print("%s: %s" % (name, person.topWords(5)))
+            print("%s: %s" % (name, person.topWords(10)))
 
     def printEmoji(self):
         for person in self._members:
